@@ -24,6 +24,7 @@ WHEN the game is over
 THEN I can save my initials and score
 ## Deployed link
 
+[Click here](https://sush-tech.github.io/Code_Quiz/)
 
 ## Sources Referenced
 
