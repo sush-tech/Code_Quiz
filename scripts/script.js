@@ -54,3 +54,136 @@ function displayQA() {
     gameOver();
   }
 }
+
+// Informing player if chosen answer is right or wrong
+function compareAnswer(event) {
+    if (q >= questionBank.length) {
+      gameOver();
+      clearInterval(timeInterval);
+    } else {
+      if (event === questionBank[q].answer) {
+        feedback1.textContent = "You are correct!";
+      } else {
+        timeLeft -= 10;
+        feedback1.textContent = "You are Wrong!";
+      }
+      score = timeLeft;
+      q++;
+      displayQA();
+    }
+  }
+  
+  // Getting scores from local storage
+  function getScore() {
+    var storedScore = JSON.parse(localStorage.getItem("highScore"));
+    if (storedScore !== null) {
+      scoreList = storedScore;
+    }
+  }
+  
+  // Saving the scores to local storage
+  function saveScore() {
+    localStorage.setItem("highScore", JSON.stringify(scoreList));
+  }
+  
+  // Displaying & hiding page items based on Game Over
+  function gameOver() {
+    scoreBtn.innerHTML = score;
+    scoreBtn.style.display = "inline-block";
+    gameCard.classList.add("hide");
+    inputForm.classList.remove("hide");
+    timerDisplay.classList.add("hide");
+    leaderBtn.classList.add("hide");
+    leaderBoard();
+  }
+  
+  // Keeping track of top 10 leaders from local storage w/ loop
+  function leaderBoard() {
+    removeFromLeaderBoard();
+    addToLeaderBoard();
+    scoreList.sort((a, b) => {
+      return b.score - a.score;
+    });
+    //only render the top 4 scores.
+    topTen = scoreList.slice(0, 10);
+  
+    for (var i = 0; i < topTen.length; i++) {
+      var player = topTen[i].player;
+      var score = topTen[i].score;
+  
+      var newDiv = document.createElement("div");
+      leaderBoardDiv.appendChild(newDiv);
+  
+      var newLabel = document.createElement("label");
+      newLabel.textContent = player + " - " + score;
+      newDiv.appendChild(newLabel);
+    }
+  }
+  
+  // Adding player initials to leader board
+  function addToLeaderBoard() {
+    leaderBoardDiv = document.createElement("div");
+    leaderBoardDiv.setAttribute("id", "playerInitials");
+    document.getElementById("leaderBoard").appendChild(leaderBoardDiv);
+  }
+  
+  // Removing player initials from leader board
+  function removeFromLeaderBoard() {
+    var removeScores = document.getElementById("playerInitials");
+    if (removeScores !== null) {
+      removeScores.remove();
+    } else {
+    }
+  }
+  
+  // Event listeners
+  beginQuiz.addEventListener("click", function (event) {
+    timer();
+    displayQA();
+    start.classList.add("hide");
+    gameCard.classList.remove("hide");
+    leaderBtn.style.display = "none";
+    scoreCard.classList.add("hide");
+  });
+  
+  card.addEventListener("click", function (event) {
+    var event = event.target;
+    compareAnswer(event.textContent.trim());
+  });
+  
+  submitBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    var playerInitials = initialsBox.value.trim();
+    var newScore = {
+      player: playerInitials,
+      score: score,
+    };
+    
+    scoreList.push(newScore);
+    saveScore();
+    leaderBoard();
+    inputForm.classList.add("hide");
+    scoreCard.classList.remove("hide");
+  });
+  
+  leaderBtn.addEventListener("click", function (event) {
+    scoreCard.classList.remove("hide");
+    leaderBtn.classList.add("hide");
+    start.classList.add("hide");
+    leaderBoard();
+  });
+  
+  // Event listener for go back button ??
+  backBtn.addEventListener("click", function (event) {
+    location.reload();
+  });
+  
+  // Event listener for clear scores button ??
+  clearBtn.addEventListener("click", function (event) {
+    scoreList = [];
+    start.classList.add("hide");
+    localStorage.setItem("highScore", JSON.stringify(scoreList));
+    leaderBoard();
+    saveScore();
+  });
+  
